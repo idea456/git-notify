@@ -110,7 +110,7 @@ func InitClient() *github.Client {
 
 		if pollBody.AccessToken != "" {
 			s.Stop()
-			fmt.Println("😙 All cleared! Thanks for authenticating uwu!")
+			fmt.Println("✅ All cleared! Thanks for authenticating uwu!")
 			os.Setenv("ACCESS_TOKEN", pollBody.AccessToken)
 			break
 		}
