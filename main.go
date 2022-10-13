@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"path"
+	"strconv"
 	"sync"
 
 	gosxnotifier "github.com/deckarep/gosx-notifier"
@@ -24,7 +26,7 @@ func Notify(msg string) {
 
 	//If necessary, check error
 	if err != nil {
-		log.Println("Uh oh!")
+		log.Println("Cant notify: ", err)
 	}
 }
 
@@ -50,7 +52,7 @@ func main() {
 	fetchPR := func(urlStr string) {
 		defer wg.Done()
 		wg.Add(1)
-		prId := 6719
+		prId, _ := strconv.Atoi(path.Base(urlStr))
 
 		pr, _, err := client.PullRequests.Get(ctx, owner, repo, prId)
 		if err != nil {
@@ -63,10 +65,9 @@ func main() {
 	}
 
 	for _, notf := range notfs {
-		go fetchPR(notf.GetSubject().GetURL())
-		// if notf.GetReason() == "review_requested" {
-		// 	go fetchPR(notf.GetSubject().GetURL())
-		// }
+		if notf.GetReason() == "author" || notf.GetReason() == "review_requested" {
+			go fetchPR(notf.GetSubject().GetURL())
+		}
 	}
 
 	wg.Wait()
